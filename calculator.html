@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Cool Calculator</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #1a1a1a;
+            font-family: Arial, sans-serif;
+        }
+        .calculator {
+            background-color: #2c2c2c;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+        #display {
+            width: 100%;
+            height: 60px;
+            margin-bottom: 20px;
+            background-color: #3a3a3a;
+            border: none;
+            border-radius: 10px;
+            font-size: 24px;
+            color: #fff;
+            text-align: right;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+        button {
+            width: 60px;
+            height: 60px;
+            font-size: 16px;
+            border: none;
+            border-radius: 50%;
+            background-color: #4a4a4a;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+        button:hover {
+            background-color: #5a5a5a;
+        }
+        button:active {
+            transform: scale(0.95);
+        }
+        .operator {
+            background-color: #ff9500;
+        }
+        .operator:hover {
+            background-color: #ffaa33;
+        }
+        #equals {
+            background-color: #4CAF50;
+        }
+        #equals:hover {
+            background-color: #45a049;
+        }
+        #clear, #cut {
+            background-color: #f44336;
+        }
+        #clear:hover, #cut:hover {
+            background-color: #da190b;
+        }
+        .function {
+            background-color: #8e44ad;
+        }
+        .function:hover {
+            background-color: #9b59b6;
+        }
+        .equation {
+            background-color: #2980b9;
+        }
+        .equation:hover {
+            background-color: #3498db;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <input type="text" id="display" readonly>
+        <div class="buttons">
+            <button id="clear">C</button>
+            <button id="cut">Cut</button>
+            <button class="operator">÷</button>
+            <button class="operator">×</button>
+            <button class="operator">-</button>
+            <button class="function">LOG</button>
+            <button class="function">LN</button>
+            <button class="function">√</button>
+            <button class="function">^</button>
+            <button class="operator">+</button>
+            <button>7</button>
+            <button>8</button>
+            <button>9</button>
+            <button>(</button>
+            <button>)</button>
+            <button>4</button>
+            <button>5</button>
+            <button>6</button>
+            <button class="function">SIN</button>
+            <button class="function">COS</button>
+            <button>1</button>
+            <button>2</button>
+            <button>3</button>
+            <button class="function">TAN</button>
+            <button class="equation">E=mc²</button>
+            <button>0</button>
+            <button>.</button>
+            <button id="equals">=</button>
+            <button>π</button>
+            <button class="equation">PV</button>
+            <button class="equation">a²+b²</button>
+            <button class="equation">F=ma</button>
+            <button class="equation">V=IR</button>
+            <button class="equation">PV=nRT</button>
+        </div>
+    </div>
+    <script>
+        const display = document.getElementById('display');
+        const buttons = document.querySelectorAll('button');
+
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                if (button.id === 'clear') {
+                    display.value = '';
+                } else if (button.id === 'cut') {
+                    display.value = display.value.slice(0, -1);
+                } else if (button.id === 'equals') {
+                    try {
+                        display.value = evaluateExpression(display.value);
+                    } catch {
+                        display.value = 'Error';
+                    }
+                } else if (button.className === 'equation') {
+                    handleEquation(button.textContent);
+                } else {
+                    display.value += button.textContent;
+                }
+            });
+        });
+
+        function evaluateExpression(expr) {
+            expr = expr.replace(/×/g, '*').replace(/÷/g, '/').replace(/π/g, 'Math.PI');
+            expr = expr.replace(/LOG\(/g, 'Math.log10(');
+            expr = expr.replace(/LN\(/g, 'Math.log(');
+            expr = expr.replace(/√\(/g, 'Math.sqrt(');
+            expr = expr.replace(/\^/g, '**');
+            expr = expr.replace(/SIN\(/g, 'Math.sin(');
+            expr = expr.replace(/COS\(/g, 'Math.cos(');
+            expr = expr.replace(/TAN\(/g, 'Math.tan(');
+            return eval(expr);
+        }
+
+        function handleEquation(eq) {
+            switch(eq) {
+                case 'E=mc²':
+                    display.value += 'E=m*c^2';
+                    break;
+                case 'PV':
+                    display.value += 'PV=FV/(1+r)^n';
+                    break;
+                case 'a²+b²':
+                    display.value += 'c^2=a^2+b^2';
+                    break;
+                case 'F=ma':
+                    display.value += 'F=m*a';
+                    break;
+                case 'V=IR':
+                    display.value += 'V=I*R';
+                    break;
+                case 'PV=nRT':
+                    display.value += 'P*V=n*R*T';
+                    break;
+            }
+        }
+
+        // Add keyboard support
+        document.addEventListener('keydown', (event) => {
+            const key = event.key;
+            if (/[0-9.+\-*/%()^]/.test(key)) {
+                display.value += key;
+            } else if (key === 'Enter') {
+                try {
+                    display.value = evaluateExpression(display.value);
+                } catch {
+                    display.value = 'Error';
+                }
+            } else if (key === 'Backspace') {
+                display.value = display.value.slice(0, -1);
+            } else if (key === 'Escape') {
+                display.value = '';
+            }
+        });
+    </script>
+</body>
+</html>
